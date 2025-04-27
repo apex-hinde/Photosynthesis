@@ -1,3 +1,4 @@
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class light_ray : MonoBehaviour
@@ -13,7 +14,7 @@ public class light_ray : MonoBehaviour
     void RenderRay(){
         LineRenderer lineRenderer = gameObject.GetComponent<LineRenderer>();
         int lineCount = 0;
-        bool isWall = true;
+        bool isWall = false;
         Vector2 lightDir = transform.right;
         Vector2 currentPos = new Vector2(transform.position.x, transform.position.y);
         lineRenderer.startColor = Color.yellow;
@@ -24,22 +25,17 @@ public class light_ray : MonoBehaviour
         lineRenderer.SetPosition(lineCount, transform.position);
         lineCount++;
         Ray2D ray = new Ray2D(currentPos, lightDir);
-        while(isWall && lineCount<10){
+        while(!isWall && lineCount<10){
 
             Vector2 RayDirectionSmall = lightDir * 0.2f;
             Debug.Log("hi");
             RaycastHit2D hit = Physics2D.Raycast(ray.origin+RayDirectionSmall, lightDir, 1000);
             if(hit.collider.gameObject.tag == "Wall"){
-                Debug.Log("hi2");
-                Debug.Log("Ray x: " + hit.point.x);
-                Debug.Log("Ray y: " + hit.point.y);
-
-
-                isWall = false;
+                isWall = true;
                 lineRenderer.SetPosition(lineCount, new Vector3(hit.point.x, hit.point.y, 0));
                 break;
             }
-            if(hit.collider.gameObject.tag == "Mirror"){
+            else if(hit.collider.gameObject.tag == "Mirror"){
                 lineRenderer.positionCount+=1;
                 Debug.Log("hi3");
                 lineRenderer.SetPosition(lineCount, new Vector3(hit.point.x, hit.point.y, 0));
@@ -52,11 +48,20 @@ public class light_ray : MonoBehaviour
                 ray = new Ray2D(hit.point, reflectedDirection);
                 lightDir = reflectedDirection;
             }
-            else{
-                Debug.Log("hi4");
+            else if(hit.collider.gameObject.tag == "Leaves"){
+                Debug.Log("leaf");
+
+                isWall = true;
+                lineRenderer.SetPosition(lineCount, new Vector3(hit.point.x, hit.point.y, 0));
+                Vector2 leafPos = hit.collider.gameObject.transform.position;
+                LeavesManager leavesManager = Object.FindFirstObjectByType<LeavesManager>();
+                leavesManager.Grow(leafPos);
                 break;
             }
-            Debug.Log("Ray hit: " + hit.collider.gameObject.name);
+            else{
+                Debug.Log("wall");
+                break;
+            }
 
         }
 

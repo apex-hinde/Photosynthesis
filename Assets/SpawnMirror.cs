@@ -13,27 +13,28 @@ public class SpawnMirror : MonoBehaviour
     void Update()
     {
         if(Input.GetMouseButtonDown(0)){
-
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z));
-            mousePos.z = 0;
-            Quaternion rotation = Quaternion.Euler(0, 0, 45); 
-            Instantiate(mirror, mousePos, rotation); 
+            if(Input.GetKey(KeyCode.LeftShift)){
+                Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z));
+                mousePos.z = 0;
+                Quaternion rotation = Quaternion.Euler(0, 0, -45); 
+                Instantiate(mirror, mousePos, rotation).GetComponent<Mirror>().rotation = -45; 
+            }
+            else{
+                Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z));
+                mousePos.z = 0;
+                Quaternion rotation = Quaternion.Euler(0, 0, 45); 
+                Instantiate(mirror, mousePos, rotation).GetComponent<Mirror>().rotation = 45; 
+            }
     }
             if(Input.GetKeyDown(KeyCode.R)){
-                Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
-                if(hit.collider != null && hit.collider.gameObject.CompareTag("Mirror"))
+                    Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+                    if(hit.collider != null && hit.collider.gameObject.CompareTag("Mirror"))
                     {
                         hit.collider.gameObject.GetComponent<Mirror>().Rotate();
                     }
         }
-        if(Input.GetMouseButtonDown(0)){
 
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z));
-            mousePos.z = 0;
-            Quaternion rotation = Quaternion.Euler(0, 0, 45); 
-            Instantiate(mirror, mousePos, rotation); 
-    }
     }
 }
 
