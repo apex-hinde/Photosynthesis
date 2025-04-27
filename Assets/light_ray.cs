@@ -1,4 +1,4 @@
-using UnityEditor.PackageManager;
+using System;
 using UnityEngine;
 
 public class light_ray : MonoBehaviour
@@ -28,7 +28,6 @@ public class light_ray : MonoBehaviour
         while(!isWall && lineCount<10){
 
             Vector2 RayDirectionSmall = lightDir * 0.2f;
-            Debug.Log("hi");
             RaycastHit2D hit = Physics2D.Raycast(ray.origin+RayDirectionSmall, lightDir, 1000);
             if(hit.collider.gameObject.tag == "Wall"){
                 isWall = true;
@@ -37,29 +36,26 @@ public class light_ray : MonoBehaviour
             }
             else if(hit.collider.gameObject.tag == "Mirror"){
                 lineRenderer.positionCount+=1;
-                Debug.Log("hi3");
                 lineRenderer.SetPosition(lineCount, new Vector3(hit.point.x, hit.point.y, 0));
                 lineCount++;
-                Debug.Log("ray direction: " + ray.direction);
                 
                 Vector2 reflectedDirection = GetReflectedDirection(ray.direction, hit.collider.gameObject.GetComponent<Mirror>().rotation);
-                Debug.Log("reflected direction: " + reflectedDirection);
 
                 ray = new Ray2D(hit.point, reflectedDirection);
                 lightDir = reflectedDirection;
             }
             else if(hit.collider.gameObject.tag == "Leaves"){
-                Debug.Log("leaf");
 
                 isWall = true;
                 lineRenderer.SetPosition(lineCount, new Vector3(hit.point.x, hit.point.y, 0));
                 Vector2 leafPos = hit.collider.gameObject.transform.position;
-                LeavesManager leavesManager = Object.FindFirstObjectByType<LeavesManager>();
-                leavesManager.Grow(leafPos);
+                Vector2Int leafGridPos = new Vector2Int((int)Math.Round(leafPos.x, 0, MidpointRounding.AwayFromZero), (int)Math.Round(leafPos.y, 0, MidpointRounding.AwayFromZero));
+                GameManager gameManager = FindFirstObjectByType<GameManager>();
+                gameManager.LightGrow(leafGridPos);
+
                 break;
             }
             else{
-                Debug.Log("wall");
                 break;
             }
 
